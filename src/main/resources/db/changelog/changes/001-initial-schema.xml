@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Users Table -->
+    <changeSet id="001-create-users-table" author="llmetter">
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="provider" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Diary Entries Table -->
+    <changeSet id="002-create-diary-entries-table" author="llmetter">
+        <createTable tableName="diary_entries">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_diary_user" references="users(id)"/>
+            </column>
+            <column name="original_text" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="edited_text" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="diary_entries" indexName="idx_diary_entries_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="diary_entries" indexName="idx_diary_entries_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+        <createIndex tableName="diary_entries" indexName="idx_diary_entries_user_created">
+            <column name="user_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Voice Recordings Table -->
+    <changeSet id="003-create-voice-recordings-table" author="llmetter">
+        <createTable tableName="voice_recordings">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="diary_entry_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_voice_diary" references="diary_entries(id)"/>
+            </column>
+            <column name="encrypted_data" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="encryption_iv" type="BYTEA">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_format" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_size" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_seconds" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Emotion Analyses Table -->
+    <changeSet id="004-create-emotion-analyses-table" author="llmetter">
+        <createTable tableName="emotion_analyses">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="diary_entry_id" type="BIGINT">
+                <constraints nullable="false" unique="true" foreignKeyName="fk_emotion_diary" references="diary_entries(id)"/>
+            </column>
+            <column name="emotion_score" type="SMALLINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary_emotion" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emotion_distribution" type="JSONB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="keywords" type="TEXT[]">
+                <constraints nullable="true"/>
+            </column>
+            <column name="summary" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Refresh Tokens Table -->
+    <changeSet id="005-create-refresh-tokens-table" author="llmetter">
+        <createTable tableName="refresh_tokens">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_token_user" references="users(id)"/>
+            </column>
+            <column name="token" type="VARCHAR(500)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="refresh_tokens" indexName="idx_refresh_tokens_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="refresh_tokens" indexName="idx_refresh_tokens_expires_at">
+            <column name="expires_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Insert Admin User -->
+    <changeSet id="006-insert-admin-user" author="llmetter">
+        <insert tableName="users">
+            <column name="email" value="admin@llmetter.com"/>
+            <column name="provider" value="ADMIN"/>
+            <!-- Password: qwe123 (BCrypt hash) -->
+            <column name="password_hash" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="created_at" valueDate="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueDate="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

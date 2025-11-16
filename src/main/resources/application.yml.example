@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: llmetter
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/llmetter
+    username: ${DB_USERNAME:moon-kun-woong}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3000ms
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # Google OAuth2 설정은 추후 추가 예정
+  # security:
+  #   oauth2:
+  #     client:
+  #       registration:
+  #         google:
+  #           client-id: ${GOOGLE_CLIENT_ID:your-client-id}
+  #           client-secret: ${GOOGLE_CLIENT_SECRET:your-client-secret}
+
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:your-api-key}
+      chat:
+        options:
+          model: claude-sonnet-4-5-20250929
+          temperature: 0.7
+    openai:
+      api-key: ${OPENAI_API_KEY:your-api-key}
+      audio:
+        transcription:
+          options:
+            model: whisper-1
+
+# Application Settings
+app:
+  jwt:
+    secret: ${JWT_SECRET:your-jwt-secret-key-min-256-bits-for-hs256-algorithm}
+    access-token-expiration: 86400000  # 1 day in milliseconds
+    refresh-token-expiration: 2592000000  # 30 days in milliseconds
+
+  encryption:
+    key: ${ENCRYPTION_KEY:your-aes-256-encryption-key-32-bytes}  # AES-256 requires 32 bytes
+
+  voice:
+    max-duration-seconds: 600  # 10 minutes
+    max-file-size-bytes: 52428800  # 50MB
+    supported-formats:
+      - webm
+      - mp3
+      - wav
+
+logging:
+  level:
+    org.llmetter: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false
