@@ -6,9 +6,9 @@
 
 LLMetter는 사용자의 음성을 통해 일기를 작성하고, AI가 감정을 분석하여 시각화해주는 웹 서비스입니다.
 
-### 구현된 주요 기능
+### 주요 기능
 
-#### 백엔드 (완료)
+#### 백엔드
 - JWT 기반 인증/인가 (Access Token + Refresh Token)
 - 음성 파일 업로드 및 AES-256-GCM 암호화 저장
 - Whisper AI를 통한 STT (Speech-to-Text)
@@ -16,19 +16,19 @@ LLMetter는 사용자의 음성을 통해 일기를 작성하고, AI가 감정�
 - 일기 CRUD API
 - 감정 그래프 및 통계 API
 - 비동기 처리 (Kotlin Coroutines)
+- 일기 재처리 기능
 
-#### 프론트엔드 (부분 완료)
+#### 프론트엔드
 - 홈페이지 (서비스 소개)
-- 로그인 페이지 (Admin 계정)
-- 대시보드 레이아웃
-- JWT 토큰 자동 관리
-- 반응형 디자인 (Tailwind CSS)
-
-#### 추후 구현 예정
+- 로그인 페이지 및 세션 관리
+- 대시보드 (감정 그래프 시각화)
 - 음성 녹음 UI (Web Audio API + Wavesurfer.js)
 - 일기 목록 및 상세 페이지
-- 감정 그래프 시각화 (Recharts)
-- Google OAuth 로그인
+- 감정 변화 그래프 (Recharts)
+- 일기 재처리 UI
+- JWT 토큰 자동 관리 및 새로고침 시 로그인 유지
+- 반응형 디자인 (Tailwind CSS)
+- 깔끔한 모노톤(흑백회색) UI
 
 ## 기술 스택
 
@@ -47,8 +47,8 @@ LLMetter는 사용자의 음성을 통해 일기를 작성하고, AI가 감정�
 - Zustand (상태관리)
 - React Router v6
 - Axios + 자동 토큰 관리
-- Recharts (차트, 추후 구현)
-- Wavesurfer.js (오디오 파형, 추후 구현)
+- Recharts (차트)
+- Wavesurfer.js (오디오 파형)
 
 ## 시작하기
 
@@ -134,24 +134,45 @@ src/main/kotlin/org/llmetter/
 │       ├── EmotionAnalysis.kt
 │       ├── EmotionCategory.kt
 │       └── EmotionRepository.kt
-├── controller/                     # REST 컨트롤러 (추가 예정)
-├── service/                        # 비즈니스 로직 (추가 예정)
-├── dto/                            # DTO (추가 예정)
+├── controller/                     # REST 컨트롤러
+│   ├── AuthController.kt
+│   ├── DiaryController.kt
+│   └── EmotionController.kt
+├── service/                        # 비즈니스 로직
+│   ├── AuthService.kt
+│   ├── DiaryService.kt
+│   ├── EmotionService.kt
+│   ├── EmotionAnalysisService.kt
+│   ├── VoiceService.kt
+│   └── STTService.kt
+├── dto/                            # DTO
+│   ├── request/
+│   └── response/
 └── util/                           # 유틸리티
     ├── JwtUtil.kt
     └── EncryptionUtil.kt
 ```
 
-## API 문서
+## API 엔드포인트
 
-API 엔드포인트는 추후 추가될 예정입니다.
+### 인증
+- `POST /api/auth/login` - 로그인
+- `POST /api/auth/refresh` - 토큰 갱신
+- `POST /api/auth/logout` - 로그아웃
 
-주요 엔드포인트:
-- `POST /api/auth/google` - Google OAuth 로그인
-- `POST /api/auth/admin` - Admin 로그인
-- `POST /api/diaries` - 음성 업로드 및 일기 작성
+### 일기
+- `POST /api/diaries` - 음성 업로드
 - `GET /api/diaries` - 일기 목록 조회
+- `GET /api/diaries/{id}` - 일기 상세 조회
+- `PATCH /api/diaries/{id}` - 일기 수정
+- `DELETE /api/diaries/{id}` - 일기 삭제
+- `POST /api/diaries/{id}/retry-stt` - STT 재처리
+
+### 감정 분석
 - `GET /api/emotions/graph` - 감정 그래프 데이터
+- `GET /api/emotions/statistics` - 감정 통계
+
+자세한 API 명세는 [DESIGN.md](./DESIGN.md)를 참고하세요.
 
 ## 데이터베이스 스키마
 
@@ -173,48 +194,41 @@ ERD 및 테이블 상세 정보는 [DESIGN.md](./DESIGN.md)를 참조하세요.
 - [x] Claude 감정 분석
 - [x] 일기 CRUD API
 - [x] 감정 그래프/통계 API
+- [x] 일기 재처리 기능
 
-### Phase 3: 프론트엔드 (진행 중)
+### Phase 3: 프론트엔드 ✅
 - [x] React 프로젝트 설정
 - [x] 홈페이지 & 로그인
 - [x] 기본 라우팅 및 상태 관리
-- [ ] 녹음 UI
-- [ ] 일기 목록/상세
-- [ ] 감정 그래프 시각화
+- [x] 녹음 UI
+- [x] 일기 목록/상세
+- [x] 감정 그래프 시각화
+- [x] 일기 재처리 UI
+- [x] 로그인 상태 유지
+- [x] 모노톤 UI 디자인
 
-### Phase 4: 고도화
+### Phase 4: 고도화 (진행 중)
 - [ ] 성능 최적화
 - [ ] 테스트 코드
 - [ ] 배포 준비
+- [ ] Google OAuth 로그인
 
-## Admin 계정
+## 최근 업데이트
 
-테스트용 Admin 계정:
-```
-Email: admin@llmetter.com
-Password: qwe123
-```
+### 버그 수정
+- 감정 분석 데이터 연결 및 저장 로직 개선
+- 새로고침 시 로그인 상태 유지 기능 추가
+- 감정 그래프 날짜 기준을 일기 작성일로 수정
+- 일기 재처리 시 중복 키 에러 해결
 
-## API 엔드포인트
+### UI 개선
+- 전체 UI를 깔끔한 모노톤(흑백회색)으로 통일
+- 일기 재처리 기능 UI 추가
+- 로그인 화면 보안 강화
 
-### 인증
-- POST /api/auth/login
-- POST /api/auth/refresh
-- POST /api/auth/logout
-
-### 일기
-- POST /api/diaries (음성 업로드)
-- GET /api/diaries (일기 목록)
-- GET /api/diaries/{id} (일기 상세)
-- PATCH /api/diaries/{id} (일기 수정)
-- DELETE /api/diaries/{id} (일기 삭제)
-- POST /api/diaries/{id}/retry-stt (STT 재처리)
-
-### 감정 분석
-- GET /api/emotions/graph (감정 그래프)
-- GET /api/emotions/statistics (감정 통계)
-
-자세한 API 명세는 `DESIGN.md`를 참고하세요.
+### 보안 강화
+- 암호화 키 SHA-256 해싱 적용
+- 로그인 화면 계정 정보 노출 제거
 
 ## 라이선스
 
