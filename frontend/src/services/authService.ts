@@ -14,6 +14,7 @@ export const authService = {
     await api.post('/auth/logout');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
   },
 
   refresh: async (refreshToken: string): Promise<AuthResponse> => {

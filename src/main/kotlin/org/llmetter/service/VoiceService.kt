@@ -77,15 +77,25 @@ class VoiceService(
             val transcribedText = sttService.transcribe(audioData)
 
             // DiaryEntry 업데이트
-            val diaryEntry = diaryRepository.findById(diaryEntryId).orElseThrow()
+            var diaryEntry = diaryRepository.findById(diaryEntryId).orElseThrow()
             diaryEntry.originalText = transcribedText
             diaryEntry.editedText = transcribedText
+
+            // 재처리 시 기존 감정 분석 삭제 (orphanRemoval로 자동 삭제됨)
+            if (diaryEntry.emotionAnalysis != null) {
+                diaryEntry.emotionAnalysis = null
+                diaryRepository.save(diaryEntry)
+                diaryRepository.flush() // 즉시 DB에 반영
+            }
+
             diaryRepository.save(diaryEntry)
 
             // 감정 분석 처리
-            emotionAnalysisService.analyzeEmotion(diaryEntry)
+            val emotionAnalysis = emotionAnalysisService.analyzeEmotion(diaryEntry)
 
-            // 상태를 COMPLETED로 변경
+            // 감정 분석 후 DiaryEntry를 다시 조회하여 최신 상태로 업데이트
+            diaryEntry = diaryRepository.findById(diaryEntryId).orElseThrow()
+            diaryEntry.emotionAnalysis = emotionAnalysis
             diaryEntry.markAsCompleted()
             diaryRepository.save(diaryEntry)
 

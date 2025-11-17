@@ -10,6 +10,7 @@ export default function DiaryDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState('');
+  const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -55,10 +56,37 @@ export default function DiaryDetailPage() {
     }
   };
 
+  const handleRetrySTT = async () => {
+    if (!diary || retrying) return;
+
+    setRetrying(true);
+    try {
+      await diaryService.retrySTT(diary.id);
+      // 3초마다 일기를 다시 불러와서 감정 분석이 완료되었는지 확인
+      const checkInterval = setInterval(async () => {
+        const updatedDiary = await diaryService.getDiary(diary.id);
+        setDiary(updatedDiary);
+        if (updatedDiary.emotionAnalysis) {
+          clearInterval(checkInterval);
+          setRetrying(false);
+        }
+      }, 3000);
+
+      // 최대 30초 후에는 자동으로 종료
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        setRetrying(false);
+      }, 30000);
+    } catch (error) {
+      alert('재처리 요청에 실패했습니다.');
+      setRetrying(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
       </div>
     );
   }
@@ -73,7 +101,7 @@ export default function DiaryDetailPage() {
         <div className="container mx-auto px-4 py-4">
           <button
             onClick={() => navigate('/diaries')}
-            className="text-purple-600 hover:text-purple-700 font-semibold"
+            className="text-gray-800 hover:text-gray-900 font-semibold"
           >
             ← 목록으로
           </button>
@@ -103,7 +131,7 @@ export default function DiaryDetailPage() {
                     <>
                       <button
                         onClick={() => setEditing(true)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+                        className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition text-sm"
                       >
                         수정
                       </button>
@@ -123,12 +151,12 @@ export default function DiaryDetailPage() {
                   <textarea
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
-                    className="w-full h-64 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                    className="w-full h-64 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-800 outline-none"
                   />
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={handleSave}
-                      className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                      className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition"
                     >
                       저장
                     </button>
@@ -160,8 +188,8 @@ export default function DiaryDetailPage() {
 
               {diary.emotionAnalysis ? (
                 <div className="space-y-4">
-                  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-                    <div className="text-5xl font-bold text-purple-600 mb-2">
+                  <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg">
+                    <div className="text-5xl font-bold text-gray-800 mb-2">
                       {diary.emotionAnalysis.emotionScore > 0 ? '+' : ''}
                       {diary.emotionAnalysis.emotionScore}
                     </div>
@@ -170,7 +198,7 @@ export default function DiaryDetailPage() {
 
                   <div>
                     <h3 className="font-semibold text-gray-700 mb-2">주요 감정</h3>
-                    <div className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-center font-semibold">
+                    <div className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg text-center font-semibold">
                       {diary.emotionAnalysis.primaryEmotion}
                     </div>
                   </div>
@@ -202,7 +230,24 @@ export default function DiaryDetailPage() {
                 </div>
               ) : (
                 <div className="text-center py-8 text-gray-500">
-                  <p>감정 분석 처리 중...</p>
+                  {retrying ? (
+                    <>
+                      <div className="flex justify-center mb-4">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-800"></div>
+                      </div>
+                      <p>감정 분석 처리 중...</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="mb-4">감정 분석 처리 중...</p>
+                      <button
+                        onClick={handleRetrySTT}
+                        className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-sm"
+                      >
+                        재처리
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>

@@ -23,21 +23,35 @@ export default function DiaryListPage() {
     }
   };
 
+  const handleRetry = async (e: React.MouseEvent, diaryId: number) => {
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    try {
+      await diaryService.retrySTT(diaryId);
+      alert('재처리를 시작했습니다. 잠시 후 다시 확인해주세요.');
+      // 3초 후 목록 새로고침
+      setTimeout(() => {
+        loadDiaries();
+      }, 3000);
+    } catch (error) {
+      alert('재처리 요청에 실패했습니다.');
+    }
+  };
+
   const getEmotionColor = (score: number) => {
-    if (score > 10) return 'text-green-600';
-    if (score > 0) return 'text-blue-600';
-    if (score > -10) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score > 10) return 'text-gray-900';
+    if (score > 0) return 'text-gray-700';
+    if (score > -10) return 'text-gray-600';
+    return 'text-gray-500';
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'COMPLETED':
-        return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">완료</span>;
+        return <span className="px-2 py-1 bg-gray-200 text-gray-800 text-xs rounded-full">완료</span>;
       case 'PROCESSING':
-        return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">처리중</span>;
+        return <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">처리중</span>;
       case 'FAILED':
-        return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">실패</span>;
+        return <span className="px-2 py-1 bg-gray-300 text-gray-700 text-xs rounded-full">실패</span>;
       default:
         return null;
     }
@@ -49,7 +63,7 @@ export default function DiaryListPage() {
         <div className="container mx-auto px-4 py-4">
           <button
             onClick={() => navigate('/dashboard')}
-            className="text-purple-600 hover:text-purple-700 font-semibold"
+            className="text-gray-800 hover:text-gray-900 font-semibold"
           >
             ← 대시보드
           </button>
@@ -62,7 +76,7 @@ export default function DiaryListPage() {
             <h1 className="text-3xl font-bold text-gray-800">내 일기</h1>
             <button
               onClick={() => navigate('/record')}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-lg hover:shadow-lg transition"
+              className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-900 hover:shadow-lg transition"
             >
               + 새 일기 작성
             </button>
@@ -70,7 +84,7 @@ export default function DiaryListPage() {
 
           {loading ? (
             <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto"></div>
               <p className="mt-4 text-gray-600">로딩 중...</p>
             </div>
           ) : diaries.length === 0 ? (
@@ -97,6 +111,14 @@ export default function DiaryListPage() {
                           })}
                         </span>
                         {getStatusBadge(diary.status)}
+                        {diary.status === 'FAILED' && (
+                          <button
+                            onClick={(e) => handleRetry(e, diary.id)}
+                            className="ml-2 px-3 py-1 bg-gray-700 text-white text-xs rounded hover:bg-gray-800 transition"
+                          >
+                            재처리
+                          </button>
+                        )}
                       </div>
                       <p className="text-gray-700 line-clamp-2">
                         {diary.editedText || diary.originalText || '처리 중...'}

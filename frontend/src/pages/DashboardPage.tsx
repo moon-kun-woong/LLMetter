@@ -24,7 +24,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-purple-600">LLMetter</h1>
+          <h1 className="text-2xl font-bold text-gray-800">LLMetter</h1>
           <div className="flex items-center gap-4">
             <span className="text-gray-700">{user?.email}</span>
             <button
@@ -45,13 +45,13 @@ export default function DashboardPage() {
         <div className="flex justify-center gap-4">
           <button
             onClick={() => navigate('/record')}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-xl transform hover:scale-105 transition"
+            className="bg-gradient-to-r from-gray-700 to-gray-900 text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-xl transform hover:scale-105 transition"
           >
             일기 작성하기
           </button>
           <button
             onClick={() => navigate('/diaries')}
-            className="bg-white border-2 border-purple-500 text-purple-500 px-8 py-4 rounded-full text-lg font-bold hover:shadow-xl transform hover:scale-105 transition"
+            className="bg-white border-2 border-gray-800 text-gray-800 px-8 py-4 rounded-full text-lg font-bold hover:shadow-xl transform hover:scale-105 transition"
           >
             일기 목록 보기
           </button>

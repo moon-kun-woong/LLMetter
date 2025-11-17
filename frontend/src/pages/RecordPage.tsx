@@ -46,7 +46,7 @@ export default function RecordPage() {
         <div className="container mx-auto px-4 py-4">
           <button
             onClick={() => navigate('/dashboard')}
-            className="text-purple-600 hover:text-purple-700 font-semibold"
+            className="text-gray-800 hover:text-gray-900 font-semibold"
           >
             ← 대시보드로 돌아가기
           </button>
@@ -61,7 +61,7 @@ export default function RecordPage() {
             </h1>
 
             {/* Recording Visualizer */}
-            <div className="mb-8 p-8 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+            <div className="mb-8 p-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl">
               <div className="text-center mb-4">
                 {isRecording ? (
                   <div className="flex items-center justify-center gap-2">
@@ -87,7 +87,7 @@ export default function RecordPage() {
                   {[...Array(20)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-1 bg-purple-500 rounded-full animate-pulse"
+                      className="w-1 bg-gray-800 rounded-full animate-pulse"
                       style={{
                         height: `${Math.random() * 60 + 20}px`,
                         animationDelay: `${i * 0.1}s`,
@@ -106,7 +106,7 @@ export default function RecordPage() {
                   className={`w-24 h-24 rounded-full text-white font-bold text-lg shadow-lg transform transition hover:scale-105 ${
                     isRecording
                       ? 'bg-red-500 hover:bg-red-600'
-                      : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                      : 'bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-gray-900'
                   }`}
                 >
                   {isRecording ? '중지' : '녹음'}
@@ -122,7 +122,7 @@ export default function RecordPage() {
                   <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition disabled:opacity-50"
+                    className="px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-lg hover:from-gray-800 hover:to-gray-900 transition disabled:opacity-50"
                   >
                     {uploading ? '업로드 중...' : '일기 저장'}
                   </button>
@@ -135,7 +135,7 @@ export default function RecordPage() {
             </div>
 
             {/* Instructions */}
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+            <div className="mt-8 p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold text-blue-900 mb-2">사용 방법</h3>
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• 녹음 버튼을 눌러 하루를 이야기하세요</li>

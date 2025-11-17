@@ -30,7 +30,9 @@ export default function EmotionGraph() {
           break;
       }
 
+      console.log('Fetching emotion graph:', { startDate, endDate, period });
       const response = await emotionService.getEmotionGraph(startDate, endDate);
+      console.log('Emotion graph response:', response);
       setData(response.data);
     } catch (error) {
       console.error('Failed to load emotion graph:', error);
@@ -56,7 +58,7 @@ export default function EmotionGraph() {
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
                 period === p
-                  ? 'bg-purple-500 text-white'
+                  ? 'bg-gray-900 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -68,7 +70,7 @@ export default function EmotionGraph() {
 
       {loading ? (
         <div className="h-64 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
         </div>
       ) : data.length === 0 ? (
         <div className="h-64 flex items-center justify-center text-gray-500">
@@ -86,7 +88,7 @@ export default function EmotionGraph() {
                   return (
                     <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
                       <p className="font-semibold">{payload[0].payload.date}</p>
-                      <p className="text-purple-600">점수: {payload[0].value}</p>
+                      <p className="text-gray-800">점수: {payload[0].value}</p>
                       <p className="text-sm text-gray-600">{payload[0].payload.emotion}</p>
                     </div>
                   );
@@ -97,9 +99,9 @@ export default function EmotionGraph() {
             <Line
               type="monotone"
               dataKey="score"
-              stroke="#8b5cf6"
+              stroke="#1f2937"
               strokeWidth={2}
-              dot={{ fill: '#8b5cf6', r: 4 }}
+              dot={{ fill: '#1f2937', r: 4 }}
             />
           </LineChart>
         </ResponsiveContainer>

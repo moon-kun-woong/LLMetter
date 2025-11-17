@@ -4,7 +4,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+    <div className="min-h-screen bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center text-white mb-16">
           <h1 className="text-6xl font-bold mb-6 animate-fade-in">
@@ -39,7 +39,7 @@ export default function HomePage() {
         <div className="text-center">
           <button
             onClick={() => navigate('/login')}
-            className="bg-white text-purple-600 px-12 py-4 rounded-full text-xl font-bold hover:bg-opacity-90 transform hover:scale-105 transition shadow-2xl"
+            className="bg-white text-gray-800 px-12 py-4 rounded-full text-xl font-bold hover:bg-opacity-90 transform hover:scale-105 transition shadow-2xl"
           >
             시작하기
           </button>

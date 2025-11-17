@@ -10,25 +10,33 @@ interface AuthState {
   isAuthenticated: () => boolean;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  accessToken: localStorage.getItem('accessToken'),
-  refreshToken: localStorage.getItem('refreshToken'),
+export const useAuthStore = create<AuthState>((set, get) => {
+  // localStorage에서 user 정보 복원
+  const storedUser = localStorage.getItem('user');
+  const initialUser = storedUser ? JSON.parse(storedUser) : null;
 
-  setAuth: (user, accessToken, refreshToken) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    set({ user, accessToken, refreshToken });
-  },
+  return {
+    user: initialUser,
+    accessToken: localStorage.getItem('accessToken'),
+    refreshToken: localStorage.getItem('refreshToken'),
 
-  clearAuth: () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    set({ user: null, accessToken: null, refreshToken: null });
-  },
+    setAuth: (user, accessToken, refreshToken) => {
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user, accessToken, refreshToken });
+    },
 
-  isAuthenticated: () => {
-    const state = get();
-    return !!state.accessToken && !!state.user;
-  },
-}));
+    clearAuth: () => {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      set({ user: null, accessToken: null, refreshToken: null });
+    },
+
+    isAuthenticated: () => {
+      const state = get();
+      return !!state.accessToken && !!state.user;
+    },
+  };
+});

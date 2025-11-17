@@ -3,6 +3,7 @@ package org.llmetter.util
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
@@ -20,7 +21,9 @@ class EncryptionUtil(
     }
 
     private val secretKey: SecretKeySpec = SecretKeySpec(
-        encryptionKey.toByteArray(StandardCharsets.UTF_8),
+        MessageDigest.getInstance("SHA-256").digest(
+            encryptionKey.toByteArray(StandardCharsets.UTF_8)
+        ),
         "AES"
     )
 

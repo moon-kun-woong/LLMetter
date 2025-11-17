@@ -23,7 +23,7 @@ class EmotionService(
 
         val graphPoints = emotions.map { emotion ->
             EmotionGraphPoint(
-                date = emotion.createdAt,
+                date = emotion.diaryEntry.createdAt,
                 emotionScore = emotion.emotionScore,
                 primaryEmotion = emotion.primaryEmotion.koreanName
             )

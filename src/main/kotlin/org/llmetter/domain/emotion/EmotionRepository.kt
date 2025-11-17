@@ -13,8 +13,8 @@ interface EmotionRepository : JpaRepository<EmotionAnalysis, Long> {
     @Query("""
         SELECT e FROM EmotionAnalysis e
         WHERE e.diaryEntry.user.id = :userId
-        AND e.createdAt BETWEEN :startDate AND :endDate
-        ORDER BY e.createdAt ASC
+        AND e.diaryEntry.createdAt BETWEEN :startDate AND :endDate
+        ORDER BY e.diaryEntry.createdAt ASC
     """)
     fun findByUserIdAndDateRange(
         userId: Long,
@@ -25,7 +25,7 @@ interface EmotionRepository : JpaRepository<EmotionAnalysis, Long> {
     @Query("""
         SELECT AVG(e.emotionScore) FROM EmotionAnalysis e
         WHERE e.diaryEntry.user.id = :userId
-        AND e.createdAt BETWEEN :startDate AND :endDate
+        AND e.diaryEntry.createdAt BETWEEN :startDate AND :endDate
     """)
     fun getAverageScoreByUserIdAndDateRange(
         userId: Long,
