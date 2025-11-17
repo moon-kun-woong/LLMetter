@@ -15,24 +15,44 @@ export default function EmotionGraph() {
   const loadGraphData = async () => {
     setLoading(true);
     try {
-      const endDate = new Date().toISOString();
+      // 로컬 시간대의 날짜 문자열 생성 함수
+      const toLocalDateTimeString = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hour = String(date.getHours()).padStart(2, '0');
+        const minute = String(date.getMinutes()).padStart(2, '0');
+        const second = String(date.getSeconds()).padStart(2, '0');
+        const ms = String(date.getMilliseconds()).padStart(3, '0');
+        return `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}`;
+      };
+
+      // endDate를 오늘 23:59:59로 설정하여 모든 일기 포함
+      const now = new Date();
+      const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      const endDate = toLocalDateTimeString(endOfDay);
+
       let startDate: string;
 
       switch (period) {
         case 'week':
-          startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+          const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          weekStart.setHours(0, 0, 0, 0);
+          startDate = toLocalDateTimeString(weekStart);
           break;
         case 'month':
-          startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+          const monthStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          monthStart.setHours(0, 0, 0, 0);
+          startDate = toLocalDateTimeString(monthStart);
           break;
         case 'all':
-          startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+          const yearStart = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          yearStart.setHours(0, 0, 0, 0);
+          startDate = toLocalDateTimeString(yearStart);
           break;
       }
 
-      console.log('Fetching emotion graph:', { startDate, endDate, period });
       const response = await emotionService.getEmotionGraph(startDate, endDate);
-      console.log('Emotion graph response:', response);
       setData(response.data);
     } catch (error) {
       console.error('Failed to load emotion graph:', error);
@@ -41,11 +61,26 @@ export default function EmotionGraph() {
     }
   };
 
-  const formatData = data.map((point) => ({
-    date: new Date(point.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
-    score: point.emotionScore,
-    emotion: point.primaryEmotion,
-  }));
+  const formatData = data.map((point) => {
+    const dateObj = new Date(point.date);
+    return {
+      date: dateObj.toLocaleString('ko-KR', {
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace(/\. /g, '/').replace(' ', ' '),
+      fullDate: dateObj.toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      score: point.emotionScore,
+      emotion: point.primaryEmotion,
+    };
+  });
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -87,9 +122,9 @@ export default function EmotionGraph() {
                 if (active && payload && payload.length) {
                   return (
                     <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                      <p className="font-semibold">{payload[0].payload.date}</p>
-                      <p className="text-gray-800">점수: {payload[0].value}</p>
-                      <p className="text-sm text-gray-600">{payload[0].payload.emotion}</p>
+                      <p className="font-semibold text-sm">{payload[0].payload.fullDate}</p>
+                      <p className="text-gray-800 font-bold mt-1">점수: {payload[0].value}</p>
+                      <p className="text-sm text-gray-600 mt-1">{payload[0].payload.emotion}</p>
                     </div>
                   );
                 }

@@ -17,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 class EmotionAnalysisService(
     private val chatModel: AnthropicChatModel,
     private val emotionRepository: EmotionRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val promptLoader: org.llmetter.util.PromptLoader
 ) {
 
     suspend fun analyzeEmotion(diaryEntry: DiaryEntry): EmotionAnalysis {
@@ -48,26 +49,11 @@ class EmotionAnalysisService(
     }
 
     private fun createAnalysisPrompt(text: String): String {
-        return """
-다음 일기 텍스트를 분석하여 JSON 형식으로 응답해주세요.
-
-일기 내용:
-"$text"
-
-감정 카테고리: JOY(기쁨), SADNESS(슬픔), ANGER(분노), ANXIETY(불안), CALM(평온), HOPE(희망),
-LONELINESS(외로움), GRATITUDE(감사), REGRET(후회), EXCITEMENT(설렘), FATIGUE(피곤함), CONTENTMENT(만족)
-
-JSON 형식 (다른 텍스트 없이 JSON만 응답):
-{
-  "emotionScore": -20부터 +20 사이의 정수 (부정적일수록 낮은 점수),
-  "primaryEmotion": "주된 감정 카테고리 (위 12개 중 하나, 대문자)",
-  "emotionDistribution": {
-    "EMOTION_NAME": 0.0-1.0 사이의 비율 (합이 1.0이 되도록)
-  },
-  "keywords": ["키워드1", "키워드2", "키워드3"],
-  "summary": "일기 내용을 한 문장으로 요약"
-}
-        """.trimIndent()
+        return promptLoader.getPrompt(
+            fileName = "emotion-analysis.yaml",
+            key = "emotion-analysis",
+            variables = mapOf("text" to text)
+        )
     }
 
     private fun parseAnalysisResult(jsonResponse: String): EmotionAnalysisResult {

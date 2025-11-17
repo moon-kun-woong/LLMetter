@@ -21,6 +21,7 @@ class EmotionService(
     ): EmotionGraphResponse {
         val emotions = emotionRepository.findByUserIdAndDateRange(userId, startDate, endDate)
 
+
         val graphPoints = emotions.map { emotion ->
             EmotionGraphPoint(
                 date = emotion.diaryEntry.createdAt,
