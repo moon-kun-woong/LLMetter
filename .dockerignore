@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Build outputs (백엔드만 빌드하므로 프론트 제외)
+build/
+target/
+*.jar
+*.war
+
+# Dependencies (프론트엔드 의존성 제외)
+node_modules/
+.gradle/
+.kotlin/
+
+# Frontend (Static Site 별도 배포)
+frontend/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Test files
+**/*test*
+**/*spec*
