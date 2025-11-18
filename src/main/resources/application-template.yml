@@ -1,0 +1,87 @@
+spring:
+  application:
+    name: llmetter
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/llmetter}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:postgres}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3000ms
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  ai:
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+      chat:
+        options:
+          model: claude-sonnet-4-5-20250929
+          temperature: 0.7
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      audio:
+        transcription:
+          options:
+            model: whisper-1
+
+# Application Settings
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration: 86400000
+    refresh-token-expiration: 2592000000
+
+  encryption:
+    key: ${ENCRYPTION_KEY}
+
+  voice:
+    max-duration-seconds: 600
+    max-file-size-bytes: 52428800
+    supported-formats:
+      - webm
+      - mp3
+      - wav
+
+logging:
+  level:
+    org.llmetter: INFO
+    org.springframework.security: INFO
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false

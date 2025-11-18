@@ -60,6 +60,7 @@ bin/
 ### Application Config (contains API keys) ###
 src/main/resources/application.yml
 src/main/resources/application-*.yml
+!src/main/resources/application-template.yml
 
 ### Logs ###
 logs/
