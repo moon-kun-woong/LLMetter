@@ -10,6 +10,11 @@ COPY gradle/ gradle/
 # Copy source code
 COPY src/ src/
 
+# Use template as application.yml if original doesn't exist
+RUN if [ ! -f src/main/resources/application.yml ]; then \
+      cp src/main/resources/application-template.yml src/main/resources/application.yml; \
+    fi
+
 # Build backend (skip tests for faster build)
 RUN ./gradlew bootJar --no-daemon
 
