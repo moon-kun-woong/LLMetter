@@ -23,18 +23,38 @@ class DataInitializer(
 
     private fun initializeAdminUser() {
         val adminEmail = "admin@llmetter.com"
+        val adminPassword = "qwe123"
 
-        if (!userRepository.existsByEmail(adminEmail)) {
+        val existingUser = userRepository.findByEmail(adminEmail)
+
+        if (existingUser.isPresent) {
+            val user = existingUser.get()
+            val expectedHash = passwordEncoder.encode(adminPassword)
+
+            // 비밀번호 검증 - 일치하지 않으면 업데이트
+            if (user.passwordHash == null || !passwordEncoder.matches(adminPassword, user.passwordHash)) {
+                logger.warn("Admin user password mismatch detected. Recreating admin user...")
+                userRepository.delete(user)
+
+                val newAdminUser = User(
+                    email = adminEmail,
+                    provider = AuthProvider.ADMIN,
+                    passwordHash = passwordEncoder.encode(adminPassword)
+                )
+                userRepository.save(newAdminUser)
+                logger.info("Admin user recreated with correct password: $adminEmail")
+            } else {
+                logger.info("Admin user already exists with correct password: $adminEmail")
+            }
+        } else {
             val adminUser = User(
                 email = adminEmail,
                 provider = AuthProvider.ADMIN,
-                passwordHash = passwordEncoder.encode("qwe123")
+                passwordHash = passwordEncoder.encode(adminPassword)
             )
 
             userRepository.save(adminUser)
             logger.info("Admin user created: $adminEmail")
-        } else {
-            logger.info("Admin user already exists: $adminEmail")
         }
     }
 }
