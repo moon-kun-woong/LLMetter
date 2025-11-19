@@ -1,6 +1,7 @@
 package org.llmetter.config
 
 import org.llmetter.service.CustomUserDetailsService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -62,13 +63,12 @@ class SecurityConfig(
     }
 
     @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
+    fun corsConfigurationSource(
+        @Value("\${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
+        allowedOrigins: String
+    ): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "https://llmetter.onrender.com"
-        )
+        configuration.allowedOrigins = allowedOrigins.split(",").map { it.trim() }
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
