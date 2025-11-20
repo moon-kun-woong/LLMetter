@@ -39,9 +39,7 @@ class SecurityConfig(
                 auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers("/", "/health", "/api/auth/**", "/error", "/actuator/health").permitAll()
-                    .requestMatchers("/static/**", "/assets/**", "/*.js", "/*.css", "/*.ico", "/*.png", "/*.jpg", "/*.svg").permitAll()
-                    .requestMatchers("/api/**").authenticated()
-                    .anyRequest().permitAll()  // SPA 라우팅을 위해 나머지는 허용 (WebConfig에서 index.html로 포워딩)
+                    .anyRequest().authenticated()
             }
 
         http.authenticationProvider(authenticationProvider())

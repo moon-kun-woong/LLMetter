@@ -15,10 +15,11 @@ target/
 
 # Dependencies (프론트엔드 의존성 제외)
 node_modules/
-frontend/node_modules/
-frontend/dist/
 .gradle/
 .kotlin/
+
+# Frontend (Static Site 별도 배포)
+frontend/
 
 # Environment files
 .env
