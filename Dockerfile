@@ -1,4 +1,16 @@
-# Stage 1: Build backend
+# Stage 1: Build frontend
+FROM node:20-alpine AS frontend-build
+
+WORKDIR /app/frontend
+
+# Copy frontend files
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Build backend
 FROM gradle:8.5-jdk17 AS build
 
 WORKDIR /app
@@ -10,6 +22,9 @@ COPY gradle/ gradle/
 # Copy source code
 COPY src/ src/
 
+# Copy frontend build output to static resources
+COPY --from=frontend-build /app/frontend/dist src/main/resources/static/
+
 # Use template as application.yml if original doesn't exist
 RUN if [ ! -f src/main/resources/application.yml ]; then \
       cp src/main/resources/application-template.yml src/main/resources/application.yml; \
@@ -18,7 +33,7 @@ RUN if [ ! -f src/main/resources/application.yml ]; then \
 # Build backend (skip tests for faster build)
 RUN ./gradlew bootJar --no-daemon
 
-# Stage 2: Runtime
+# Stage 3: Runtime
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
