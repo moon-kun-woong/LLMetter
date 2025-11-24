@@ -233,3 +233,8 @@ ERD 및 테이블 상세 정보는 [DESIGN.md](./DESIGN.md)를 참조하세요.
 ## 라이선스
 
 이 프로젝트는 개인 프로젝트입니다.
+
+
+## 아키텍처 구성
+![KakaoTalk_Photo_2025-11-24-22-44-55](https://github.com/user-attachments/assets/9d710e12-6904-4e40-9ee4-d42fb73f6375)
+
