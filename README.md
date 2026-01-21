@@ -172,11 +172,6 @@ src/main/kotlin/org/llmetter/
 - `GET /api/emotions/graph` - 감정 그래프 데이터
 - `GET /api/emotions/statistics` - 감정 통계
 
-자세한 API 명세는 [DESIGN.md](./DESIGN.md)를 참고하세요.
-
-## 데이터베이스 스키마
-
-ERD 및 테이블 상세 정보는 [DESIGN.md](./DESIGN.md)를 참조하세요.
 
 ## 개발 로드맵
 
@@ -207,12 +202,6 @@ ERD 및 테이블 상세 정보는 [DESIGN.md](./DESIGN.md)를 참조하세요.
 - [x] 로그인 상태 유지
 - [x] 모노톤 UI 디자인
 
-### Phase 4: 고도화 (진행 중)
-- [ ] 성능 최적화
-- [ ] 테스트 코드
-- [ ] 배포 준비
-- [ ] Google OAuth 로그인
-
 ## 최근 업데이트
 
 ### 버그 수정
@@ -228,7 +217,6 @@ ERD 및 테이블 상세 정보는 [DESIGN.md](./DESIGN.md)를 참조하세요.
 
 ### 보안 강화
 - 암호화 키 SHA-256 해싱 적용
-- 로그인 화면 계정 정보 노출 제거
 
 ## 라이선스
 
